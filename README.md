@@ -65,7 +65,12 @@ Inside cl_chronos/,
 
    RTL verification code and scripts.
 
-
+Compatibility
+=============
+CentOS-7 (2009)  
+aws-fpga v1.4.24  
+Vivado 2021.2  
+AWS FPGA Developer AMI v1.12.2  
 
 Getting started - A tutorial on configuring and running sssp.
 =============================================================
