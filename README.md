@@ -70,12 +70,12 @@ Inside cl_chronos/,
 Getting started - A tutorial on configuring and running sssp.
 =============================================================
 
-Chronos depends on the [Amazon AWS EC2 Hardware and Software Development kit](https://github.com/aws/aws-fpga). 
-The install.sh script would automatically
+Chronos depends on the [Amazon AWS EC2 Hardware and Software Development kit](https://github.com/aws/aws-fpga).  
+The `install.sh` script would automatically
 clone this repo and perform other necessary configurations.
 
 
-* Step 1: Configure number of tiles and other queue sizes in design/config.sv
+* Step 1: Configure number of tiles and other queue sizes in `$CL_DIR/design/config.sv`
 
    For this example, we will build a single tile system with the default
    parameters.
@@ -84,13 +84,14 @@ clone this repo and perform other necessary configurations.
 * Step 2: Configure Chronos to use sssp
 
    We will build an 8 cores/tile sssp system. This is specified in
-   design/apps/sssp/config.vh
+   `$CL_DIR/design/apps/sssp/config.vh`
 
-   run the following to generate the sssp cores
-
-   ( $CL_DIR = hdk/cl/developer_design/cl_chronos)
-   cd $CL_DIR/design
-   ./scripts/gen_cores.py sssp
+   run the following to generate the sssp cores   
+   ($CL_DIR = hdk/cl/developer_design/cl_chronos) 
+   ```   
+   cd $CL_DIR/design   
+   python ./scripts/gen_cores.py sssp   
+   ```
 
 * Step 3: Test graph generation
 
@@ -98,41 +99,43 @@ clone this repo and perform other necessary configurations.
    running sssp on a small graph. First to generate such a graph we need to run the
    graph_gen tool.
 
+   ```
+   cd $CL_DIR/tools/graph_gen/   
+   make   
+   ./graph_gen sssp grid 4   
+   ```
 
-   cd $CL_DIR/tools/graph_gen/
-   make
-   ./graph_gen sssp grid 4
-
-   This would generate a 4x4 grid graph with random weights. (grid_4x4.sssp).
+   This would generate a 4x4 grid graph with random weights. (grid_4x4.sssp).   
 
 * Step 4: RTL Simulation
 
-   4.1) First, compile the design with Vivado simulator. Our testbench is in
-   (verif/tests/test_chronos)
-
-   cd $CL_DIR/verif/scripts/
+   4.1) First, compile the design with Vivado simulator. Our testbench is in `$CL_DIR/verif/tests/test_chronos`
+   ```
+   cd $CL_DIR/verif/scripts/  
+   make TEST=test_chronos make_sim_dir   
    make TEST=test_chronos compile
+   ```
 
-   This would create a directory verif/sim/test_chronos.
+   This would create a directory `$CL_DIR/verif/sim/test_chronos`.
 
    4.2) Now, we need to copy the input file into this directory before running the simulation.
-
+   ```
    cp $CL_DIR/tools/graph_gen/grid_4x4.sssp $CL_DIR/verif/sim/test_chronos/input_graph
-
+   ```
    (The testbench expects the input file be named 'input_graph')
 
    4.3) Now run the simulation
-
-   cd $CL_DIR/verif/scripts/
+   ```
+   cd $CL_DIR/verif/scripts/   
    make TEST=test_chronos run
-
+   ```
    If all goes well, you will see the testbench completing with 0 errors
 
 * Step 5: Synthesis
-
-   cd $CL_DIR/build/scripts/
-   ./aws_build_dcp_from_cl.sh
-
+   ```
+   cd $CL_DIR/build/scripts/  
+   source aws_build_dcp_from_cl.sh
+   ```
    This would launch a vivado synthesis/ place-and-route job. The output of this
    process is a placed-and-routed design placed in
    $CL_DIR/build/checkpoints/to_aws/<timestamp>.Developer_CL.tar 
@@ -144,10 +147,10 @@ clone this repo and perform other necessary configurations.
    However, I will breifly summarize the steps here
 
    First, copy the design file to a location in Amazon S3.
-
+   ```
    aws s3 cp $CL_DIR/build/checkpoints/to_aws/<timestamp>.Developer_CL.tar
       <location_in_s3>.tar 
-
+   ```
    Create the FPGA image
 
    ~/bin/aws ec2 create-fpga-image --name <name> --input-storage-location
@@ -163,17 +166,23 @@ clone this repo and perform other necessary configurations.
 
    6.1) Setup the environment
       at repo-root
+      ```
       source sdk_setup.sh
+      ```
    6.2) Load the generated image into the FPGA
+      ```
       sudo fpga-load-local-image -S 0 -I <fgpa_image_id>
+      ```
       (I've noted that sometimes, this command needed to be run twice the first
       time after the instance is booted up)
       
    6.3) Build and run the runtime program that will transfer the input graph to the FPGA,
    collect the results and analyze performance
-      cd $CL_DIR/software/runtime
-      make
-      ./test_chronos sssp grid_4x4.sssp
+      ```
+      cd $CL_DIR/software/runtime  
+      make  
+      ./test_chronos sssp grid_4x4.sssp  
+      ```
 
 
 Notes on Chronos software interface
