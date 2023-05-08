@@ -44,8 +44,7 @@
 --include ${HDK_SHELL_DESIGN_DIR}/ip/cl_axi_interconnect/ipshared/7e3a/hdl
 --include ${HDK_SHELL_DESIGN_DIR}/sh_ddr/sim
 
-# ${CL_ROOT}/../common/design/cl_common_defines.vh
-# ${CL_ROOT}/design/cl_chronos_defines.vh
+${CL_ROOT}/design/cl_chronos_defines.vh
 ${CL_ROOT}/design/config.sv
 ${CL_ROOT}/design/interface.sv
 ${CL_ROOT}/verif/tests/mem_ctrl.sv

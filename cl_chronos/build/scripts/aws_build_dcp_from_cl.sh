@@ -45,10 +45,6 @@ ignore_memory_requirement=0
 expected_memory_usage=30000000
 uram_option=2
 vdefine=""
-module="cl_chronos"
-
-# Use timestamp for logs and output files
-timestamp=$(date +"%y_%m_%d-%H%M%S") 
 
 function info_msg {
   echo -e "INFO: $1"
@@ -79,12 +75,6 @@ while [ "$1" != "" ]; do
     case $1 in
         -script )               shift
                                 vivado_script=$1
-                                ;;
-        -module )               shift
-                                module=$1
-                                ;;
-        -tag )                  shift
-                                timestamp=$1
                                 ;;
         -strategy )             shift
                                 strategy=$1
@@ -161,7 +151,6 @@ if [[ $uram_option != @(2|3|4) ]]; then
 fi
 # process vdefines
 info_msg "VDEFINE is : $vdefine"
-info_msg "module is : $module"
 shopt -s extglob
 IFS=',' read -r -a vdefine_array <<< "$vdefine"
 
@@ -227,7 +216,9 @@ then
 	exit 1
 fi
 
-logname=$timestamp.$module.log
+# Use timestamp for logs and output files
+timestamp=$(date +"%y_%m_%d-%H%M%S") 
+logname=$timestamp.vivado.log
 ln -s -f $logname last_log
 
 info_msg "Environment variables and directories are present. Checking for Vivado installation."
@@ -242,19 +233,17 @@ hdk_version=$(grep 'HDK_VERSION' $HDK_DIR/hdk_version.txt | sed 's/=/ /g' | awk 
 shell_version=$(grep 'SHELL_VERSION' $HDK_SHELL_DIR/shell_version.txt | sed 's/=/ /g' | awk '{print $2}')
 
 # Get the PCIe Device & Vendor ID from ID0
-id0_version=$(grep 'CL_SH_ID0' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
+id0_version=$(grep -v '^\//' $CL_DIR/design/cl_id_defines.vh | grep 'CL_SH_ID0' | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
 device_id="0x${id0_version:0:4}";
 vendor_id="0x${id0_version:4:4}";
 
 # Get the PCIe Subsystem & Subsystem Vendor ID from ID1
-id1_version=$(grep 'CL_SH_ID1' $CL_DIR/design/cl_id_defines.vh | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
+id1_version=$(grep -v '^\//' $CL_DIR/design/cl_id_defines.vh | grep 'CL_SH_ID1' | grep 'define' | sed 's/_//g' | awk -F "h" '{print $2}')
 subsystem_id="0x${id1_version:0:4}";
 subsystem_vendor_id="0x${id1_version:4:4}";
 
 # Run vivado
-cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs
-$timestamp $strategy $hdk_version $shell_version $device_id $vendor_id
-$subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $uram_option $notify $opt_vdefine $module"
+cmd="vivado -mode batch -nojournal -log $logname -source $vivado_script -tclargs $timestamp $strategy $hdk_version $shell_version $device_id $vendor_id $subsystem_id $subsystem_vendor_id $clock_recipe_a $clock_recipe_b $clock_recipe_c $uram_option $notify $opt_vdefine"
 if [[ "$foreground" == "0" ]]; then
   nohup $cmd > $timestamp.nohup.out 2>&1 &
   

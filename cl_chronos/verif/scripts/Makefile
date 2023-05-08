@@ -13,17 +13,32 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+ifndef VIVADO_TOOL_VERSION
+$(error Environment variable VIVADO_TOOL_VERSION not set. please source hdk_setup.sh)
+else
+$(info VIVADO_TOOL_VERSION = $(VIVADO_TOOL_VERSION))
+endif
 
 export TEST ?= test_null
 export C_TEST ?= test_null
 
-export CL_ROOT = $(PWD)/../..
+export SCRIPTS_DIR = $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+export CL_ROOT = $(realpath $(SCRIPTS_DIR)/../..)
+export SDK_DIR = $(AWS_FPGA_REPO_DIR)/sdk
 
-export C_INC_DIR  = $(CL_ROOT)/software/verif_rtl/include
-export C_SRC_DIR  = $(CL_ROOT)/software/verif_rtl/src
+export C_COMMON_DIR        = $(HDK_COMMON_DIR)/software
+export C_SDK_USR_INC_DIR   = $(SDK_DIR)/userspace/include
+export C_SDK_USR_UTILS_DIR = $(SDK_DIR)/userspace/utils
+export C_INC_DIR  = $(CL_ROOT)/software/runtime
+export C_SRC_DIR  = $(CL_ROOT)/software/runtime
 
 export TEST_NAME =  $(CL_ROOT)/verif/tests/$(TEST).sv
-export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
+
+ifeq ($(C_TEST),test_null)
+  export C_TEST_NAME = $(HDK_COMMON_DIR)/software/src/$(C_TEST).c
+else
+  export C_TEST_NAME = $(C_SRC_DIR)/$(C_TEST).c
+endif
 
 export SIM_ROOT = $(CL_ROOT)/verif/sim
 
@@ -33,8 +48,6 @@ else
   export SIM_DIR = $(SIM_ROOT)/$(C_TEST)
 endif
 
-
-export SCRIPTS_DIR = $(PWD)
 export XILINX_IP   = $(HDK_SHELL_DESIGN_DIR)/ip
 export SH_LIB_DIR  = $(HDK_SHELL_DESIGN_DIR)/lib
 export SH_INF_DIR  = $(HDK_SHELL_DESIGN_DIR)/interfaces
@@ -43,7 +56,13 @@ export SH_SH_DIR   = $(HDK_SHELL_DESIGN_DIR)/sh_ddr/sim
 SV_TEST_LIST = test_task_unit
 C_TEST_LIST  = test_task_unit.c
 
-all:	make_sim_dir compile run
+C_FILES = $(C_TEST_NAME) $(C_SDK_USR_UTILS_DIR)/sh_dpi_tasks.c $(C_COMMON_DIR)/src/fpga_pci_sv.c
+
+ifeq ($(XCHK), 1)
+  all:	make_sim_dir compile_chk run
+else
+  all:	make_sim_dir compile run
+endif
 
 include $(HDK_COMMON_DIR)/verif/tb/scripts/Makefile.common.inc
 

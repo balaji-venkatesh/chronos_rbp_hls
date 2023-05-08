@@ -39,7 +39,7 @@ set uram_option         [lindex $argv 11]
 set notify_via_sns      [lindex $argv 12]
 set VDEFINES            [lindex $argv 13]
 ##################################################
-## Flow control variables 
+## Flow control variables
 ##################################################
 set cl.synth   1
 set implement  1
@@ -104,50 +104,38 @@ puts "All reports and intermediate results will be time stamped with $timestamp"
 
 set_msg_config -id {Chipscope 16-3} -suppress
 set_msg_config -string {AXI_QUAD_SPI} -suppress
-set_msg_config -string {PIPE_CL_SH_AURORA_STAT} -suppress
-set_msg_config -string {PIPE_CL_SH_HMC_STAT} -suppress
-set_msg_config -string {PIPE_AURORA_CHANNEL_UP} -suppress
-set_msg_config -string {PIPE_HMC_IIC} -suppress
-set_msg_config -string {PIPE_SH_CL_AURORA_STAT} -suppress
-
 
 # Suppress Warnings
 # These are to avoid warning messages that may not be real issues. A developer
 # may comment them out if they wish to see more information from warning
 # messages.
 set_msg_config -id {Common 17-55}        -suppress
-set_msg_config -id {Designutils 20-1567} -suppress
-set_msg_config -id {IP_Flow 19-2162}     -suppress
-set_msg_config -id {Project 1-498}       -suppress
-set_msg_config -id {Route 35-328}        -suppress
-set_msg_config -id {Vivado 12-508}       -suppress
-set_msg_config -id {Constraints 18-4866} -suppress
-set_msg_config -id {filemgmt 56-12}      -suppress
-set_msg_config -id {Constraints 18-4644} -suppress
-set_msg_config -id {Coretcl 2-64}        -suppress
 set_msg_config -id {Vivado 12-4739}      -suppress
-set_msg_config -id {Vivado 12-5201}      -suppress
+set_msg_config -id {Constraints 18-4866} -suppress
+set_msg_config -id {IP_Flow 19-2162}     -suppress
+set_msg_config -id {Route 35-328}        -suppress
+set_msg_config -id {Vivado 12-1008}      -suppress
+set_msg_config -id {Vivado 12-508}       -suppress
+set_msg_config -id {filemgmt 56-12}      -suppress
 set_msg_config -id {DRC CKLD-1}          -suppress
+set_msg_config -id {DRC CKLD-2}          -suppress
 set_msg_config -id {IP_Flow 19-2248}     -suppress
-#set_msg_config -id {Opt 31-155}          -suppress
-set_msg_config -id {Synth 8-115}         -suppress
-set_msg_config -id {Synth 8-3936}        -suppress
-set_msg_config -id {Vivado 12-1023}      -suppress
+set_msg_config -id {Vivado 12-1580}      -suppress
 set_msg_config -id {Constraints 18-550}  -suppress
 set_msg_config -id {Synth 8-3295}        -suppress
 set_msg_config -id {Synth 8-3321}        -suppress
 set_msg_config -id {Synth 8-3331}        -suppress
 set_msg_config -id {Synth 8-3332}        -suppress
+set_msg_config -id {Synth 8-6014}        -suppress
+set_msg_config -id {Timing 38-436}       -suppress
+set_msg_config -id {DRC REQP-1853}       -suppress
 set_msg_config -id {Synth 8-350}         -suppress
 set_msg_config -id {Synth 8-3848}        -suppress
 set_msg_config -id {Synth 8-3917}        -suppress
-set_msg_config -id {Synth 8-6014}        -suppress
-set_msg_config -id {Vivado 12-1580}      -suppress
-set_msg_config -id {Constraints 18-619}  -suppress
-set_msg_config -id {DRC CKLD-2}          -suppress
-set_msg_config -id {DRC REQP-1853}       -suppress
-set_msg_config -id {Timing 38-436}       -suppress
+set_msg_config -id {Opt 31-430}          -suppress
 
+set_msg_config -severity "CRITICAL WARNING" -string "WRAPPER_INST/SH" -suppress
+set_msg_config -severity "WARNING"          -string "WRAPPER_INST/SH" -suppress
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling the encrypt.tcl.";
 
@@ -163,7 +151,7 @@ if {[string compare $notify_via_sns "1"] == 0} {
 }
 
 ##################################################
-### Strategy options 
+### Strategy options
 ##################################################
 switch $strategy {
     "BASIC" {
@@ -219,27 +207,24 @@ source $HDK_SHELL_DIR/build/scripts/device_type.tcl
 source $HDK_SHELL_DIR/build/scripts/step_user.tcl -notrace
 
 ########################################
-## Generate clocks based on Recipe 
+## Generate clocks based on Recipe
 ########################################
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) Calling aws_gen_clk_constraints.tcl to generate clock constraints from developer's specified recipe.";
 
 source $HDK_SHELL_DIR/build/scripts/aws_gen_clk_constraints.tcl
 #################################################################
-##### Do not remove this setting. Need to workaround bug
+#### Do not remove this setting. Need to workaround bug
 ##################################################################
 set_param hd.clockRoutingWireReduction false
-
 ##################################################
 ### CL XPR OOC Synthesis
 ##################################################
 if {${cl.synth}} {
    source -notrace ./synth_${CL_MODULE}.tcl
    set synth_dcp ${timestamp}.CL.post_synth.dcp
-} else {
-   open_checkpoint ../checkpoints/CL.post_synth.dcp
-   set synth_dcp CL.post_synth.dcp
 }
+
 ##################################################
 ### Implementation
 ##################################################
@@ -254,8 +239,8 @@ if {$implement} {
       set_property IP_REPO_PATHS $cacheDir [current_project]
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Combining Shell and CL design checkpoints";
       add_files $HDK_SHELL_DIR/build/checkpoints/from_aws/SH_CL_BB_routed.dcp
-      add_files $CL_DIR/build/checkpoints/$synth_dcp
-      set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $CL_DIR/build/checkpoints/$synth_dcp]
+      add_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp
+      set_property SCOPED_TO_CELLS {WRAPPER_INST/CL} [get_files $CL_DIR/build/checkpoints/${timestamp}.CL.post_synth.dcp]
 
       #Read the constraints, note *DO NOT* read cl_clocks_aws (clocks originating from AWS shell)
       read_xdc [ list \
@@ -271,7 +256,7 @@ if {$implement} {
       # Apply Clock Properties for Clock Table Recipes
       ##################################################
       puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Sourcing aws_clock_properties.tcl to apply properties to clocks. ";
-      
+
       # Apply properties to clocks
       source $HDK_SHELL_DIR/build/scripts/aws_clock_properties.tcl
 
@@ -283,6 +268,7 @@ if {$implement} {
    ########################
    # CL Optimize
    ########################
+   set place_preHookTcl  ""
    if {$opt} {
       puts "\nAWS FPGA: ([clock format [clock seconds] -format %T]) - Running optimization";
       impl_step opt_design $TOP $opt_options $opt_directive $opt_preHookTcl $opt_postHookTcl
@@ -337,10 +323,11 @@ if {$implement} {
    # This is what will deliver to AWS
    puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Writing final DCP to to_aws directory.";
 
-   #checkpoint can used by developer for analysis and hence donot encrypt
+   #writing unencrypted dcp for analysis to checkpoints dir.
    write_checkpoint -force $CL_DIR/build/checkpoints/${timestamp}.SH_CL_routed.dcp
-   #checkpoint that will be sent to aws and hence encrypt
-   write_checkpoint -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
+
+   #writing encrypted dcp which can be sent to AWS
+   write_checkpoint -encrypt -force $CL_DIR/build/checkpoints/to_aws/${timestamp}.SH_CL_routed.dcp
 
    # Generate debug probes file
    write_debug_probes -force -no_partial_ltxfile -file $CL_DIR/build/checkpoints/${timestamp}.debug_probes.ltx
@@ -351,7 +338,22 @@ if {$implement} {
 # ################################################
 # Create Manifest and Tarball for delivery
 # ################################################
-
+# imitate encrypt.tcl without actually encrypting
+set HDK_SHELL_DESIGN_DIR $::env(HDK_SHELL_DESIGN_DIR)
+set CL_DIR $::env(CL_DIR)
+set TARGET_DIR $CL_DIR/build/src_post_encryption
+set UNUSED_TEMPLATES_DIR $HDK_SHELL_DESIGN_DIR/interfaces
+exec rm -f $TARGET_DIR/*
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/*.{v,sv,vh}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/sssp_hls/*.{v,sv,vh}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/sssp/*.{v,sv,vh}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/des/*.{v,sv,vh}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/astar/*.{v,sv,vh,dat}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/riscv/*.{v,sv,vh,dat}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/maxflow/*.{v,sv,vh,dat}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/color/*.{v,sv,vh,dat}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $CL_DIR/design/apps/silo/*.{v,sv,vh,dat}]  $TARGET_DIR 
+file copy -force {*}[glob -nocomplain -- $UNUSED_TEMPLATES_DIR/*.inc]  $TARGET_DIR 
 # Create a zipped tar file, that would be used for createFpgaImage EC2 API
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Compress files for sending to AWS. "
@@ -398,5 +400,3 @@ if {[string compare $notify_via_sns "1"] == 0} {
 }
 
 puts "AWS FPGA: ([clock format [clock seconds] -format %T]) - Build complete.";
-
-
