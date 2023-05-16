@@ -79,7 +79,7 @@ ALL TIMES.
  
 #include <stdio.h>
 #include "hls_stream.h"
-#include "hls_math.h"
+#include "math.h"
 #include "ap_int.h"
 
 typedef struct {
@@ -97,30 +97,32 @@ typedef struct {
 typedef union IntFloat {
 	unsigned int intval;
 	float floatval;
-};
+} intfloat_t;
 
 typedef union Args {
+	Args() {};
+	~Args() {};
 	struct { ap_uint<32> arg0; ap_uint<32> arg1;
 		ap_uint<32> arg2; ap_uint<32> arg3; } unpacked;
 	ap_uint<128> packed;
-};
+} args_t;
 
 typedef ap_uint<32> addr_t;
 
-void rbp_core (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hls::stream<undo_log_t>* undo_log_entry);
+void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hls::stream<undo_log_t>* undo_log_entry);
 
 static inline float logSum(float log1, float log2) {
    float max = log1 > log2 ? log1 : log2;
    float min = log1 < log2 ? log1 : log2;
-   float ans = max + hls::log(1.0 + hls::exp(min - max));
+   float ans = max + logf(1.0 + expf(min - max));
    return ans;
 }
 
 static inline float distance(float log00, float log01, float log10, float log11) {
    float ans = 0.0;
    // split each expf into a task use direct cast to int value as id
-   ans += hls::abs(hls::exp(log00) - hls::exp(log10));
-   ans += hls::abs(hls::exp(log01) - hls::exp(log11));
+   ans += abs(expf(log00) - expf(log10));
+   ans += abs(expf(log01) - expf(log11));
    return ans;
 }
 
@@ -129,7 +131,7 @@ static inline float distance(float log00, float log01, float log10, float log11)
 
 static inline ap_uint<32> timestamp(float dist) {
    float scaled = dist * SCALING_FACTOR;
-   ap_uint<32> ts = UINT32_MAX - 8 - hls::round(scaled);
+   ap_uint<32> ts = UINT32_MAX - 8 - (unsigned int) (scaled);
    return ts;
 }
 #endif
