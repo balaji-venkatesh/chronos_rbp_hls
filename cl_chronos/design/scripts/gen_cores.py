@@ -1,12 +1,12 @@
 import sys, os
 if len(sys.argv) < 2:
-    print("Usage gen_config.py app <pipe>")
+    print("Usage gen_cores.py app <pipe>")
     exit(0)
 app = sys.argv[1]
 pipe = 0
 if len(sys.argv) > 2:
     if (sys.argv[2].find("pipe") >= 0):
-        pipe = 1;
+        pipe = 1
 
 # Should be run from cl_chronos/design
 if pipe:
@@ -22,13 +22,13 @@ is_hls = app.find("hls")>=0
 cores = []
 
 n_types = 0
-n_app_threads = 0;
+n_app_threads = 0
 
 for line in configs:
     if (line.find('#') >=0):
         continue
     if ( line.find('USE_PIPELINED_TEMPLATE') >= 0):
-       cmd = "cp apps/"+app+"/config_pipe.vh app_config.vh";
+       cmd = "cp apps/"+app+"/config_pipe.vh app_config.vh"
        print(cmd)
        os.system(cmd)
        # place an empty file in gen_core_spec.vh, since core.sv fails
@@ -48,14 +48,14 @@ for line in configs:
     if (line.find("mt_core")>=0):
         [core_type, n_threads] = line.split()[1:3]
         if (n_threads <= 1) :
-            printf("mt_core should have >1 thread")
-            exit(0);
+            print("mt_core should have >1 thread")
+            exit(0)
         cores.append( [core_type, n_types, n_threads, True])
         n_types += 1
-        n_app_threads += int(n_threads);
+        n_app_threads += int(n_threads)
     elif (line.find("core")>=0):
         [core_type, n_cores] = line.split()[1:3]
-        task_type = n_types;
+        task_type = n_types
         if (line.find("terminate")>=0):
             task_type = 12; # hack
         if (line.find("all_tasks")>=0):
@@ -63,13 +63,13 @@ for line in configs:
         for i in range(int(n_cores)):
             cores.append( [core_type, task_type, 1, False])
         n_types += 1
-        n_app_threads += int(n_cores);
+        n_app_threads += int(n_cores)
     if (line.find("RISCV_APP") >=0):
         rv_app = line.split()[1]
 
 
-print arg_width
-print cores
+print(arg_width)
+print(cores)
 
 n_app_cores = len(cores) 
 print(n_app_cores, n_app_threads)
@@ -138,12 +138,75 @@ core_inst = """
         .ap_state (ap_state)
         """
 
-if (is_hls):  # BIG HACK
+if (core_type == 'sssp_hls'):  # BIG HACK
     core_inst = core_inst.replace(".ap_state (ap_state)", "")
     core_inst = core_inst.replace("undo_log_entry_ap_vld", "undo_log_entry_V_TVALID")
     core_inst = core_inst.replace("undo_log_entry_ap_rdy", "undo_log_entry_V_TREADY")
     core_inst = core_inst.replace("undo_log_entry  ", "undo_log_entry_V_TDATA  ")
     core_inst = core_inst.replace("app_undo_log_ready),", "app_undo_log_ready)")
+elif (core_type == 'rbp_hls'):
+    print("rbp_hls detected")
+    core_inst = """
+        .ap_clk             (clk),
+        .ap_rst_n           (ap_rst_n),
+        .ap_start           (ap_start),
+        .ap_done            (ap_done),
+        .ap_idle            (ap_idle),
+        .ap_ready           (ap_ready),
+        .task_in            ({task_in.args, task_in.ttype, task_in.object, task_in.ts}),
+        .task_out_TDATA     (task_out_data),
+        .task_out_TVALID    (task_out_valid),
+        .task_out_TREADY    (task_out_ready),
+        .m_axi_l1_AWVALID   (l1.awvalid),
+        .m_axi_l1_AWREADY   (l1.awready),
+        .m_axi_l1_AWADDR    (l1.awaddr[31:0]),
+        .m_axi_l1_AWID      (),
+        .m_axi_l1_AWLEN     (l1.awlen),
+        .m_axi_l1_AWSIZE    (l1.awsize),
+        .m_axi_l1_AWBURST   (),
+        .m_axi_l1_AWLOCK    (),
+        .m_axi_l1_AWCACHE   (),
+        .m_axi_l1_AWPROT    (),
+        .m_axi_l1_AWQOS     (),
+        .m_axi_l1_AWREGION  (),
+        .m_axi_l1_AWUSER    (),
+        .m_axi_l1_WVALID    (l1.wvalid),
+        .m_axi_l1_WREADY    (l1.wready),
+        .m_axi_l1_WDATA     (l1.wdata[$data_width:0]),
+        .m_axi_l1_WSTRB     (l1.wstrb[3:0]),
+        .m_axi_l1_WLAST     (l1.wlast),
+        .m_axi_l1_WID       (),
+        .m_axi_l1_WUSER     (),
+        .m_axi_l1_ARVALID   (l1.arvalid),
+        .m_axi_l1_ARREADY   (l1.arready),
+        .m_axi_l1_ARADDR    (l1.araddr[31:0]),
+        .m_axi_l1_ARID      (),
+        .m_axi_l1_ARLEN     (l1.arlen),
+        .m_axi_l1_ARSIZE    (l1.arsize),
+        .m_axi_l1_ARBURST   (),
+        .m_axi_l1_ARLOCK    (),
+        .m_axi_l1_ARCACHE   (),
+        .m_axi_l1_ARPROT    (),
+        .m_axi_l1_ARQOS     (),
+        .m_axi_l1_ARREGION  (),
+        .m_axi_l1_ARUSER    (),
+        .m_axi_l1_RVALID    (ap_l1_rvalid),
+        .m_axi_l1_RREADY    (ap_l1_rready),
+        .m_axi_l1_RDATA     (l1.rdata[$data_width:0]),
+        .m_axi_l1_RLAST     (ap_l1_rlast),
+        .m_axi_l1_RID       (1'b0),
+        .m_axi_l1_RUSER     (1'b0),
+        .m_axi_l1_RRESP     (l1.rresp),
+        .m_axi_l1_BVALID    (ap_l1_bvalid),
+        .m_axi_l1_BREADY    (ap_l1_bready),
+        .m_axi_l1_BRESP     (l1.bresp),
+        .m_axi_l1_BID       (1'b0),
+        .m_axi_l1_BUSER     (1'b0),
+        .undo_log_entry_TDATA   (app_undo_log_data),
+        .undo_log_entry_TVALID  (app_undo_log_valid),
+        .undo_log_entry_TREADY  (app_undo_log_ready)
+        """
+    
 
 for i in range(len(cores)):
     (core_type, task_type, threads, custom) = cores[i]
