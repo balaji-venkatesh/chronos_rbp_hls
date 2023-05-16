@@ -95,10 +95,12 @@ ${CL_ROOT}/design/apps/maxflow/maxflow_pipe.sv
 ${CL_ROOT}/design/apps/color/color.sv
 ${CL_ROOT}/design/apps/color/color_pipe.sv
 ${CL_ROOT}/design/apps/silo/silo_pipe.sv
+${CL_ROOT}/design/apps/rbp_hls/rbp_hls.v
 ${CL_ROOT}/design/cl_chronos.sv
 
 -f ${HDK_COMMON_DIR}/verif/tb/filelists/tb.${SIMULATOR}.f
 -f ${CL_ROOT}/design/apps/astar/astar.f
+-f ${CL_ROOT}/design/apps/rbp_hls/rbp_hls.f
 
 ${HDK_SHELL_DESIGN_DIR}/ip/axi_clock_converter_0/sim/axi_clock_converter_0.v
 ${HDK_SHELL_DESIGN_DIR}/ip/dest_register_slice/sim/dest_register_slice.v
