@@ -82,11 +82,12 @@ ALL TIMES.
 #include "math.h"
 #include "ap_int.h"
 
-typedef struct {
+typedef struct __attribute__((__packed__)) {
 	ap_uint<32> ts;
 	ap_uint<32> object;
-	ap_uint<4> ttype;
+	ap_uint<8> ttype;
 	ap_uint<128> args;
+	//ap_uint<1> no_write;
 } task_t;
 
 typedef struct {
@@ -130,8 +131,8 @@ static inline float distance(float log00, float log01, float log10, float log11)
 #define SCALING_FACTOR 		(1U << 31)
 
 static inline ap_uint<32> timestamp(float dist) {
-   float scaled = dist * SCALING_FACTOR;
-   ap_uint<32> ts = UINT32_MAX - 8 - (unsigned int) (scaled);
+   float scaled = (dist * SCALING_FACTOR) * 4;
+   ap_uint<32> ts = UINT32_MAX - (unsigned int) (scaled);
    return ts;
 }
 #endif

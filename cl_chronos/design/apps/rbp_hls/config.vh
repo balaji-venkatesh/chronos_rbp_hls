@@ -22,5 +22,6 @@
  */
 
 ARG_WIDTH 128
+N_TASK_TYPES 256
 
-core rbp_hls 8
+core rbp_hls 8 all_tasks

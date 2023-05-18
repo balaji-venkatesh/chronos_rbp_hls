@@ -230,6 +230,16 @@ int main(int argc, const char** argv) {
     }
     printf("\n");
 
+    for (uint32_t i = 0; i < numE; i++) {
+        printf("Edge %d: (%f, %f, %f, %f) \n", i, mrf->edges[i].logPotentials[0][0], mrf->edges[i].logPotentials[0][1], mrf->edges[i].logPotentials[1][0], mrf->edges[i].logPotentials[1][1]);
+    }
+    printf("\n");
+
+    for (uint32_t i = 0; i < numV; i++) {
+        printf("Node %d: (%f, %f) \n", i, mrf->nodes[i].logNodePotentials[0], mrf->nodes[i].logNodePotentials[1]);
+    }
+    printf("\n");
+
     for (uint32_t i = 0; i < 2 * numE; i++) {
         printf("Message %d: (%d, %d) = (%f, %f)\n", i, mrf->messages[i].i, mrf->messages[i].j, mrf->messages[i].logMu[0], mrf->messages[i].logMu[1]);
     }

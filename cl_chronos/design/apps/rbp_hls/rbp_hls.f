@@ -12,5 +12,5 @@ ${CL_ROOT}/design/apps/rbp_hls/rbp_hls_flow_control_loop_pipe_sequential_init.v
 ${CL_ROOT}/design/apps/rbp_hls/rbp_hls_fmul_32ns_32ns_32_4_max_dsp_1_ip.v
 ${CL_ROOT}/design/apps/rbp_hls/rbp_hls_fmul_32ns_32ns_32_4_max_dsp_1.v
 ${CL_ROOT}/design/apps/rbp_hls/rbp_hls_l1_m_axi.v
-${CL_ROOT}/design/apps/rbp_hls/rbp_hls_rbp_hls_Pipeline_VITIS_LOOP_478_6.v
+${CL_ROOT}/design/apps/rbp_hls/rbp_hls_rbp_hls_Pipeline_VITIS_LOOP_487_6.v
 ${CL_ROOT}/design/apps/rbp_hls/rbp_hls_regslice_both.v

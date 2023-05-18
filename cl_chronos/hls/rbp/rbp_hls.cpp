@@ -146,10 +146,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		out_args.unpacked.arg2 = mid;
 
 		task_t task_out_temp;
-		task_out_temp.ts = task_in.ts;
+		task_out_temp.ts = task_in.ts + 1;
 		task_out_temp.object = source_nid + 4 * nume;
 		task_out_temp.ttype = CALC_LOOKAHEAD_TASK;
 		task_out_temp.args = out_args.packed;
+		//task_out_temp.no_write = 1;
 
 		task_out->write(task_out_temp);
 
@@ -249,10 +250,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		out_args.unpacked.arg1 = temp_lookahead[1].intval;
 
 		task_t task_out_temp;
-		task_out_temp.ts = task_in.ts;
+		task_out_temp.ts = task_in.ts + 1;
 		task_out_temp.object = mid;
 		task_out_temp.ttype = CALC_PRIORITY_TASK;
 		task_out_temp.args = out_args.packed;
+		//task_out_temp.no_write = 1;
 
 		task_out->write(task_out_temp);
 
@@ -281,24 +283,27 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		// Calculate residual
 		float residual = distance(logmu[0], logmu[1], lookahead[0], lookahead[1]);
 
-		// Calculate priority
-		ap_uint<32> update_ts = timestamp(residual);
+		if (residual > sensitivity) {
+			// Calculate priority
+			ap_uint<32> update_ts = timestamp(residual);
 
-		// printf("mid: %d, residual: %f, update_ts: %d\n", (int) mid, residual, (int) update_ts);
+			// printf("mid: %d, residual: %f, update_ts: %d\n", (int) mid, residual, (int) update_ts);
 
-		// Enqueue WRITE_PRIORITY_TASK
-		args_t out_args;
-		out_args.unpacked.arg0 = in_args.unpacked.arg0;
-		out_args.unpacked.arg1 = in_args.unpacked.arg1;
-		out_args.unpacked.arg2 = update_ts;
+			// Enqueue WRITE_PRIORITY_TASK
+			args_t out_args;
+			out_args.unpacked.arg0 = in_args.unpacked.arg0;
+			out_args.unpacked.arg1 = in_args.unpacked.arg1;
+			out_args.unpacked.arg2 = update_ts;
 
-		task_t task_out_temp;
-		task_out_temp.ts = task_in.ts;
-		task_out_temp.object = mid + 2 * nume;
-		task_out_temp.ttype = WRITE_PRIORITY_TASK;
-		task_out_temp.args = out_args.packed;
+			task_t task_out_temp;
+			task_out_temp.ts = task_in.ts + 1;
+			task_out_temp.object = mid + 2 * nume;
+			task_out_temp.ttype = WRITE_PRIORITY_TASK;
+			task_out_temp.args = out_args.packed;
+			//task_out_temp.no_write = 0;
 
-		task_out->write(task_out_temp);
+			task_out->write(task_out_temp);
+		}
 
 	} else if (task_in.ttype == WRITE_PRIORITY_TASK) {
 		// Read priority
@@ -309,12 +314,13 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		// Write priority
 		ap_uint<32> pid = task_in.object - 2 * nume;
 		ap_uint<32> old_ts = l1[base_message_priorities + pid];
-		l1[base_message_priorities + pid] = update_ts;
 
 		undo_log_t ulog;
 		ulog.addr = (base_message_priorities + pid) << 2;
 		ulog.data = old_ts;
 		undo_log_entry->write(ulog);
+
+		l1[base_message_priorities + pid] = update_ts;
 
 		// Enqueue UPDATE_MESSAGE_TASK
 		args_t out_args;
@@ -330,6 +336,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		task_out_temp.object = task_in.object;
 		task_out_temp.ttype = UPDATE_MESSAGE_TASK;
 		task_out_temp.args = out_args.packed;
+		//task_out_temp.no_write = 1;
 
 		task_out->write(task_out_temp);
 
@@ -352,10 +359,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 			out_args.unpacked.arg1 = in_args.unpacked.arg1;
 
 			task_t task_out_temp;
-			task_out_temp.ts = enq_ts;
+			task_out_temp.ts = enq_ts + 1;
 			task_out_temp.object = mid;
 			task_out_temp.ttype = UPDATE_MESSAGE_VAL_TASK;
 			task_out_temp.args = out_args.packed;
+			//task_out_temp.no_write = 0;
 
 			task_out->write(task_out_temp);
 		}
@@ -381,9 +389,6 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		logmu[1] = temp_logmu[1].floatval;
 
 		// Write logmu
-		l1[base_messages + (2 * mid)] = in_args.unpacked.arg0;
-		l1[base_messages + (2 * mid) + 1] = in_args.unpacked.arg1;
-
 		undo_log_t ulog;
 		ulog.addr = (base_messages + (2 * mid)) << 2;
 		ulog.data = temp_logmu[0].intval;
@@ -392,6 +397,9 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		ulog.addr = ((base_messages + (2 * mid)) + 1) << 2;
 		ulog.data = temp_logmu[1].intval;
 		undo_log_entry->write(ulog);
+
+		l1[base_messages + (2 * mid)] = in_args.unpacked.arg0;
+		l1[base_messages + (2 * mid) + 1] = in_args.unpacked.arg1;
 
 		// Calculate difference between old and new logmu
 		float diff[2];
@@ -411,10 +419,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		out_args.unpacked.arg2 = mid;
 
 		task_t task_out_temp;
-		task_out_temp.ts = task_in.ts;
+		task_out_temp.ts = task_in.ts + 1;
 		task_out_temp.object = nid + 4 * nume;
 		task_out_temp.ttype = UPDATE_NODE_LOGPRODUCTIN_TASK;
 		task_out_temp.args = out_args.packed;
+		//task_out_temp.no_write = 0;
 
 		task_out->write(task_out_temp);
 					
@@ -446,9 +455,6 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		temp_new_logproductin[0].floatval = new_logproductin[0];
 		temp_new_logproductin[1].floatval = new_logproductin[1];
 
-		l1[base_node_logproductins + (2 * nid)] = temp_new_logproductin[0].intval;
-		l1[base_node_logproductins + (2 * nid) + 1] = temp_new_logproductin[1].intval;
-
 		undo_log_t ulog;
 		ulog.addr = (base_node_logproductins + (2 * nid)) << 2;
 		ulog.data = temp_node_logproductin[0].intval;
@@ -457,6 +463,9 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		ulog.addr = ((base_node_logproductins + (2 * nid)) + 1) << 2;
 		ulog.data = temp_node_logproductin[1].intval;
 		undo_log_entry->write(ulog);
+
+		l1[base_node_logproductins + (2 * nid)] = temp_new_logproductin[0].intval;
+		l1[base_node_logproductins + (2 * nid) + 1] = temp_new_logproductin[1].intval;
 
 		// For each affected node, enqueue READ_REVERSE_MESSAGE_TASK
 		ap_uint<32> mid = in_args.unpacked.arg2;
@@ -497,10 +506,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 				out_args.unpacked.arg0 = affected_mid;
 
 				task_t task_out_temp;
-				task_out_temp.ts = task_in.ts;
+				task_out_temp.ts = task_in.ts + 1;
 				task_out_temp.object = reverse_affected_mid;
 				task_out_temp.ttype = READ_REVERSE_MESSAGE_TASK;
 				task_out_temp.args = out_args.packed;
+				//task_out_temp.no_write = 1;
 
 				task_out->write(task_out_temp);
 			}

@@ -44,6 +44,7 @@ logic [511:0] log_entry;
 logic [31:0] ocl_addr, ocl_data; 
 integer dist_actual, dist_ref;
 integer num_errors;
+integer logmu0, logmu1;
 
 localparam HOST_SPILL_AREA = 32'h1000000;
 localparam CL_SPILL_AREA = (1<<30);
@@ -87,6 +88,7 @@ initial begin
       "color"   : input_file = "input_color";
       "maxflow" : input_file = "input_maxflow";
       "silo"    : input_file = "silo_tx";
+      "rbp_hls" : input_file = "input_rbp";
    endcase
 
    read_and_transfer_input_file();
@@ -139,6 +141,14 @@ initial begin
    if (APP_NAME == "silo") begin
       task_enq(0, 0, 0, 0, 0, 0);
    end      
+   if (APP_NAME == "rbp_hls") begin
+      for (int i = 0; i < (2 * file[2]); i += 2) begin
+         task_enq(0, i, 0, 2, i + 1, 0);
+      end
+      for (int i = 1; i < (2 * file[2]); i += 2) begin
+         task_enq(0, i, 0, 2, i - 1, 0);
+      end
+   end
     
    //ocl_poke(N_TILES, ID_GLOBAL, MEM_XBAR_RATE_CTRL, {16'h1, 16'd64});
    
@@ -246,6 +256,23 @@ initial begin
    end
    if (APP_NAME == "silo") begin
        silo_verify();
+   end
+   if (APP_NAME == "rbp_hls") begin
+      BASE_END = file[15];
+      read_cl_memory( .host_addr(BASE_END*4), .cl_addr(file[11]*4), .len(file[2]*64));
+      for (int i=0;i<file[2]*2;i++) begin
+         // TODO: fix cache flushing
+         // TODO: add verification with reference
+         logmu0[ 7: 0] = tb.hm_get_byte( (BASE_END + i * 2)* 4);
+         logmu0[15: 8] = tb.hm_get_byte( (BASE_END + i * 2)* 4+ 1);
+         logmu0[23:16] = tb.hm_get_byte( (BASE_END + i * 2)* 4+ 2);
+         logmu0[31:24] = tb.hm_get_byte( (BASE_END + i * 2)* 4+ 3);
+         logmu1[ 7: 0] = tb.hm_get_byte( (BASE_END + i * 2 + 1)* 4);
+         logmu1[15: 8] = tb.hm_get_byte( (BASE_END + i * 2 + 1)* 4+ 1);
+         logmu1[23:16] = tb.hm_get_byte( (BASE_END + i * 2 + 1)* 4+ 2);
+         logmu1[31:24] = tb.hm_get_byte( (BASE_END + i * 2 + 1)* 4+ 3);
+         $display("mid: %d, logmu: [%f, %f]", i, $bitstoshortreal(logmu0), $bitstoshortreal(logmu1)); 
+      end
    end
 
 

@@ -88,7 +88,7 @@ int main () {
   std::priority_queue<task_t, std::vector<task_t>, compare_task > pq;
 
   ap_uint<32> mem[16384] = {0};
-  FILE* fp = fopen("input_graph", "rb");
+  FILE* fp = fopen("input_rbp", "rb");
   printf("File %p\n", fp);
   if (fp == NULL) {
      printf("Error opening file");
@@ -103,21 +103,30 @@ int main () {
   printf("%d\n", (unsigned int) nume);
 
   for (int i = 0; i < nume * 2; i+=2) {
-	  task_t initial_task = {0,i,0,i+1};
-	  printf("\t Enqueue: (%u,%u)\n", (unsigned int) (initial_task.ts), (unsigned int) (initial_task.object));
+	  args_t in_args;
+	  in_args.unpacked.arg0 = i + 1;
+	  task_t initial_task = {0,i,0,in_args.packed};
+	  printf("\t Enqueue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (initial_task.ts), (unsigned int) (initial_task.object),
+			  (unsigned int)(in_args.unpacked.arg0), (unsigned int)(in_args.unpacked.arg1), (unsigned int)(in_args.unpacked.arg2), (unsigned int)(in_args.unpacked.arg3));
 	  pq.push(initial_task);
   }
 
   for (int i = 1; i < nume * 2; i+=2) {
-	  task_t initial_task = {0,i,0,i-1};
-	  printf("\t Enqueue: (%u,%u)\n", (unsigned int) (initial_task.ts), (unsigned int) (initial_task.object));
+	  args_t in_args;
+	  in_args.unpacked.arg0 = i - 1;
+	  task_t initial_task = {0,i,0,in_args.packed};
+	  printf("\t Enqueue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (initial_task.ts), (unsigned int) (initial_task.object),
+	  			  (unsigned int)(in_args.unpacked.arg0), (unsigned int)(in_args.unpacked.arg1), (unsigned int)(in_args.unpacked.arg2), (unsigned int)(in_args.unpacked.arg3));
 	  pq.push(initial_task);
   }
 
   while(!pq.empty()) {
 	  task_t task_in = pq.top();
 	  pq.pop();
-	  printf("Dequeue (%u,%u)\n", (unsigned int) (task_in.ts), (unsigned int) (task_in.object));
+	  args_t in_args;
+	  in_args.packed = task_in.args;
+	  printf("\t Dequeue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (task_in.ts), (unsigned int) (task_in.object),
+	  	  			  (unsigned int)(in_args.unpacked.arg0), (unsigned int)(in_args.unpacked.arg1), (unsigned int)(in_args.unpacked.arg2), (unsigned int)(in_args.unpacked.arg3));
 
 	  hls::stream<task_t> task_out;
 	  rbp_hls(task_in, &task_out, mem, &undo_log_entry);
@@ -126,7 +135,10 @@ int main () {
 	  while(!task_out.empty()) {
 		  out = task_out.read();
 		  pq.push(out);
-		  printf("\t Enqueue: (%u,%u)\n", (unsigned int) (out.ts), (unsigned int) (out.object));
+		  args_t out_args;
+		  out_args.packed = out.args;
+		  printf("\t Enqueue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (out.ts), (unsigned int) (out.object),
+		  	  			  (unsigned int)(out_args.unpacked.arg0), (unsigned int)(out_args.unpacked.arg1), (unsigned int)(out_args.unpacked.arg2), (unsigned int)(out_args.unpacked.arg3));
 	  }
   }
 
