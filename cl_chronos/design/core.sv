@@ -93,6 +93,7 @@ typedef enum logic[2:0] {
    } core_state_t;
 
 logic ap_rst_n;
+logic ap_rst_n_pending;
 
 logic ap_start;
 logic ap_done;
@@ -271,6 +272,21 @@ always_comb begin
    endcase
 end
 
+// // HACK: wait for read response for 31 cycles before reseting
+// logic [4:0] wait_cycles;
+// always_ff @(posedge clk) begin
+//    if (state == WAIT_BVALID) begin
+//       wait_cycles <= wait_cycles + 1;
+//    end else begin
+//       wait_cycles <= 0;
+//    end
+
+//    if (wait_cycles == 31) begin
+//       writes_left <= writes_left - 1;
+//    end
+// end
+
+
 // If the app_core was aborted with pending mem requeuest,
 // core should stall until all have a response
 always_comb begin
@@ -310,23 +326,73 @@ end
 always_ff @(posedge clk) begin
    if (state == NEXT_TASK) begin
       if (task_arvalid & task_rvalid) begin
-         $display("[%5d][tile-%2d][core-%2d] dequeue_task: ts:%5x  object:%5x ttype:%2d args:(%4d, %4d) slot:%3d",
+         $display("[%5d][tile-%2d][core-%2d] dequeue_task: ts:%5x  object:%5x ttype:%2d args:(%4d, %4d, %4d, %4d) slot:%3d",
             cycle, TILE_ID, CORE_ID, task_rdata.ts, task_rdata.object, task_rdata.ttype,
-            task_rdata.args[63:32], task_rdata.args[31:0], task_rslot);
+            task_rdata.args[31:0], task_rdata.args[63:32], task_rdata.args[95:64], task_rdata.args[127:96], task_rslot);
       end
    end
 
    if (task_wvalid & task_wready) begin
-         $display("[%5d][tile-%2d][core-%2d] \tenqueue_task: ts:%5x  object:%5x ttype:%2d args:(%4d, %4d)",
+         $display("[%5d][tile-%2d][core-%2d] \tenqueue_task: ts:%5x  object:%5x ttype:%2d args:(%4d, %4d, %4d, %4d)",
             cycle, TILE_ID, CORE_ID, task_wdata.ts, task_wdata.object, task_wdata.ttype,
-            task_wdata.args[63:32], task_wdata[31:0]);
+            task_wdata.args[31:0], task_wdata.args[63:32], task_wdata.args[95:64], task_wdata.args[127:96]);
+
+      // HACK; need to figure out bug with flushing cache in testbench 
+      // if (task_wdata.ttype == 1) begin
+      //    if (task_wdata.args[95:64] % 2 == 0) begin
+      //       $display("mid: %d, logmu: [%f, %f]", task_wdata.args[95:64] + 1, $bitstoshortreal(task_wdata.args[31:0]), $bitstoshortreal(task_wdata.args[63:32]));
+      //    end else begin
+      //       $display("mid: %d, logmu: [%f, %f]", task_wdata.args[95:64] - 1, $bitstoshortreal(task_wdata.args[31:0]), $bitstoshortreal(task_wdata.args[63:32]));
+      //    end
+      // end
    end
+
+   // if (l1.awvalid & l1.awready) begin
+   //    $display("[%5d][tile-%2d][core-%2d] \tawaddr: %x, awlen: %d, awsize: %d, awid: %d",
+   //       cycle, TILE_ID, CORE_ID, l1.awaddr[31:0], l1.awlen, l1.awsize, l1.awid);
+   // end
+
+   // if (l1.wvalid & l1.wready) begin
+   //    $display("[%5d][tile-%2d][core-%2d] \twdata: %x, wstrb: %x, wlast: %d, wid: %d",
+   //       cycle, TILE_ID, CORE_ID, l1_wdata_32bit, l1.wstrb[3:0], l1.wlast, l1.wid);
+   // end
+
+   // if (l1.arvalid & l1.arready) begin
+   //    $display("[%5d][tile-%2d][core-%2d] \taraddr: %x, arlen: %d, arsize: %d, arid: %d",
+   //       cycle, TILE_ID, CORE_ID, l1.araddr[31:0], l1.arlen, l1.arsize, l1.arid);
+   // end
+   
+   // if (l1.rvalid & l1.rready) begin
+   //    $display("[%5d][tile-%2d][core-%2d] \trdata: %x, rlast: %d, rid: %d",
+   //       cycle, TILE_ID, CORE_ID, l1_rdata_32bit, l1.rlast, l1.rid);
+   // end
+
    abort_running_task_d <= abort_running_task;
    if (abort_running_task & !abort_running_task_d) begin
          $display("[%5d][tile-%2d][core-%2d] \tabort running task", 
             cycle, TILE_ID, CORE_ID);
    end
 end
+
+// always_ff @(state) begin
+//    if (state == NEXT_TASK) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: NEXT_TASK", cycle, TILE_ID, CORE_ID);
+//    end else if (state == INFORM_CQ) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: INFORM_CQ", cycle, TILE_ID, CORE_ID);
+//    end else if (state == START_CORE) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: START_CORE", cycle, TILE_ID, CORE_ID);
+//    end else if (state == WAIT_CORE) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: WAIT_CORE", cycle, TILE_ID, CORE_ID);
+//    end else if (state == ABORT_TASK) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: ABORT_TASK", cycle, TILE_ID, CORE_ID);
+//    end else if (state == FINISH_TASK) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: FINISH_TASK", cycle, TILE_ID, CORE_ID);
+//    end else if (state == WAIT_BVALID) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: WAIT_BVALID", cycle, TILE_ID, CORE_ID);
+//    end else if (state == WAIT_RVALID) begin
+//       $display("[%5d][tile-%2d][core-%2d] state: WAIT_RVALID", cycle, TILE_ID, CORE_ID);
+//    end
+// end
 
 
 `endif
@@ -435,11 +501,14 @@ end
 
 // Core abort is implemented by resetting the core.
 // Hold the rst_n for 6 cycles 
+
+assign ap_rst_n = !(!(ap_rst_n_pending) & (writes_left == 0) & !((l1.awvalid & l1.awready) === 1'b1));
+
 logic [2:0] rst_counter;
 always_ff @(posedge clk) begin
    if (!rstn) begin
       rst_counter <= 0;
-      ap_rst_n <= 1'b0;
+      ap_rst_n_pending <= 1'b0;
    end else begin
       if (state == WAIT_CORE & !ap_done) begin
          if (abort_running_task_q) begin
@@ -448,7 +517,7 @@ always_ff @(posedge clk) begin
       end else begin
          rst_counter <= 0;
       end
-      ap_rst_n <= !((rst_counter > 0) &  (rst_counter < '1));
+      ap_rst_n_pending <= !(rst_counter > 0);
    end
 end
 

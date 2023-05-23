@@ -118,7 +118,7 @@ output   m_axi_l1_RREADY;
 input  [31:0] m_axi_l1_RDATA;
 input   m_axi_l1_RLAST;
 input  [0:0] m_axi_l1_RID;
-input  [4:0] m_axi_l1_RFIFONUM;
+input  [8:0] m_axi_l1_RFIFONUM;
 input  [0:0] m_axi_l1_RUSER;
 input  [1:0] m_axi_l1_RRESP;
 input   m_axi_l1_BVALID;

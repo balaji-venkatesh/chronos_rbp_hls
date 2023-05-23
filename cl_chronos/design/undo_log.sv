@@ -291,7 +291,7 @@ assign l2.wdata = data_read;
 assign l2.awid = ID_BASE | reg_rthread;
 assign l2.wid = ID_BASE | reg_rthread;
 assign l2.wlast = 1'b1;
-assign l2.wstrb = '1;
+assign l2.wstrb = 16'h000000000000000f;
 assign l2.bready = (restore_ack_state == RESTORE_ACK_IDLE);
 
 

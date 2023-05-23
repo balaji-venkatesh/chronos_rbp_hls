@@ -580,7 +580,7 @@ reg    l1_RREADY;
 wire   [31:0] l1_RDATA;
 wire    l1_RLAST;
 wire   [0:0] l1_RID;
-wire   [4:0] l1_RFIFONUM;
+wire   [8:0] l1_RFIFONUM;
 wire   [0:0] l1_RUSER;
 wire   [1:0] l1_RRESP;
 wire    l1_BVALID;
@@ -1556,9 +1556,9 @@ rbp_hls_l1_m_axi #(
     .USER_MAXREQS( 5 ),
     .NUM_READ_OUTSTANDING( 16 ),
     .NUM_WRITE_OUTSTANDING( 16 ),
-    .MAX_READ_BURST_LENGTH( 1 ),
-    .MAX_WRITE_BURST_LENGTH( 1 ),
-    .USER_RFIFONUM_WIDTH( 5 ),
+    .MAX_READ_BURST_LENGTH( 16 ),
+    .MAX_WRITE_BURST_LENGTH( 16 ),
+    .USER_RFIFONUM_WIDTH( 9 ),
     .C_M_AXI_ID_WIDTH( C_M_AXI_L1_ID_WIDTH ),
     .C_M_AXI_ADDR_WIDTH( C_M_AXI_L1_ADDR_WIDTH ),
     .C_M_AXI_DATA_WIDTH( C_M_AXI_L1_DATA_WIDTH ),
