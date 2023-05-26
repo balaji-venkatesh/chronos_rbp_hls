@@ -502,7 +502,9 @@ end
 // Core abort is implemented by resetting the core.
 // Hold the rst_n for 6 cycles 
 
-assign ap_rst_n = !(!(ap_rst_n_pending) & (writes_left == 0) & !((l1.awvalid & l1.awready) === 1'b1));
+assign ap_rst_n = !(!(ap_rst_n_pending) & 
+                     (writes_left == 0) & !((l1.awvalid & l1.awready) === 1'b1) &
+                     (reads_left == 0) & !((l1.arvalid & l1.arready) === 1'b1));
 
 logic [2:0] rst_counter;
 always_ff @(posedge clk) begin
