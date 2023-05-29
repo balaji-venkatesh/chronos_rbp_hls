@@ -272,20 +272,6 @@ always_comb begin
    endcase
 end
 
-// // HACK: wait for read response for 31 cycles before reseting
-// logic [4:0] wait_cycles;
-// always_ff @(posedge clk) begin
-//    if (state == WAIT_BVALID) begin
-//       wait_cycles <= wait_cycles + 1;
-//    end else begin
-//       wait_cycles <= 0;
-//    end
-
-//    if (wait_cycles == 31) begin
-//       writes_left <= writes_left - 1;
-//    end
-// end
-
 
 // If the app_core was aborted with pending mem requeuest,
 // core should stall until all have a response
@@ -337,35 +323,7 @@ always_ff @(posedge clk) begin
             cycle, TILE_ID, CORE_ID, task_wdata.ts, task_wdata.object, task_wdata.ttype,
             task_wdata.args[31:0], task_wdata.args[63:32], task_wdata.args[95:64], task_wdata.args[127:96]);
 
-      // HACK; need to figure out bug with flushing cache in testbench 
-      // if (task_wdata.ttype == 1) begin
-      //    if (task_wdata.args[95:64] % 2 == 0) begin
-      //       $display("mid: %d, logmu: [%f, %f]", task_wdata.args[95:64] + 1, $bitstoshortreal(task_wdata.args[31:0]), $bitstoshortreal(task_wdata.args[63:32]));
-      //    end else begin
-      //       $display("mid: %d, logmu: [%f, %f]", task_wdata.args[95:64] - 1, $bitstoshortreal(task_wdata.args[31:0]), $bitstoshortreal(task_wdata.args[63:32]));
-      //    end
-      // end
    end
-
-   // if (l1.awvalid & l1.awready) begin
-   //    $display("[%5d][tile-%2d][core-%2d] \tawaddr: %x, awlen: %d, awsize: %d, awid: %d",
-   //       cycle, TILE_ID, CORE_ID, l1.awaddr[31:0], l1.awlen, l1.awsize, l1.awid);
-   // end
-
-   // if (l1.wvalid & l1.wready) begin
-   //    $display("[%5d][tile-%2d][core-%2d] \twdata: %x, wstrb: %x, wlast: %d, wid: %d",
-   //       cycle, TILE_ID, CORE_ID, l1_wdata_32bit, l1.wstrb[3:0], l1.wlast, l1.wid);
-   // end
-
-   // if (l1.arvalid & l1.arready) begin
-   //    $display("[%5d][tile-%2d][core-%2d] \taraddr: %x, arlen: %d, arsize: %d, arid: %d",
-   //       cycle, TILE_ID, CORE_ID, l1.araddr[31:0], l1.arlen, l1.arsize, l1.arid);
-   // end
-   
-   // if (l1.rvalid & l1.rready) begin
-   //    $display("[%5d][tile-%2d][core-%2d] \trdata: %x, rlast: %d, rid: %d",
-   //       cycle, TILE_ID, CORE_ID, l1_rdata_32bit, l1.rlast, l1.rid);
-   // end
 
    abort_running_task_d <= abort_running_task;
    if (abort_running_task & !abort_running_task_d) begin
