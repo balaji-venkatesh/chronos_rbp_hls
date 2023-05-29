@@ -132,7 +132,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		logmu[1] = l1[base_messages + (2 * reverse_mid) + 1];
 
 		// Find message id
-		args_t in_args;
+		args_t in_args(0,0,0,0);
 		in_args.packed = task_in.args;
 		ap_uint<32> mid = in_args.unpacked.arg0;
 
@@ -140,16 +140,16 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		ap_uint<32> source_nid = l1[base_message_nodes + (2 * mid)];
 
 		// Enqueue CALC_LOOKAHEAD_TASK
-		args_t out_args;
-		out_args.unpacked.arg0 = logmu[0];
-		out_args.unpacked.arg1 = logmu[1];
-		out_args.unpacked.arg2 = mid;
+		args_t out_args(logmu[0], logmu[1], mid, 0);
+		// out_args.unpacked.arg0 = logmu[0];
+		// out_args.unpacked.arg1 = logmu[1];
+		// out_args.unpacked.arg2 = mid;
 
-		task_t task_out_temp;
-		task_out_temp.ts = task_in.ts + 1;
-		task_out_temp.object = source_nid + 4 * nume;
-		task_out_temp.ttype = CALC_LOOKAHEAD_TASK;
-		task_out_temp.args = out_args.packed;
+		task_t task_out_temp = {task_in.ts + 1, source_nid + 4 * nume, CALC_LOOKAHEAD_TASK, out_args.packed};
+		//task_out_temp.ts = task_in.ts + 1;
+		//task_out_temp.object = source_nid + 4 * nume;
+		//task_out_temp.ttype = CALC_LOOKAHEAD_TASK;
+		//task_out_temp.args = out_args.packed;
 		//task_out_temp.no_write = 1;
 
 		task_out->write(task_out_temp);
@@ -167,7 +167,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		//printf("nid: %d, logproductin: [%f, %f]\n", (int) nid, logproductin[0], logproductin[1]);
 
 		// Read edge potentials
-		args_t in_args;
+		args_t in_args(0,0,0,0);
 		in_args.packed = task_in.args;
 		ap_uint<32> mid = in_args.unpacked.arg2;
 
@@ -245,9 +245,9 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		temp_lookahead[0].floatval = lookahead[0];
 		temp_lookahead[1].floatval = lookahead[1];
 
-		args_t out_args;
-		out_args.unpacked.arg0 = temp_lookahead[0].intval;
-		out_args.unpacked.arg1 = temp_lookahead[1].intval;
+		args_t out_args(temp_lookahead[0].intval, temp_lookahead[1].intval, 0, 0);
+		//out_args.unpacked.arg0 = temp_lookahead[0].intval;
+		//out_args.unpacked.arg1 = temp_lookahead[1].intval;
 
 		task_t task_out_temp;
 		task_out_temp.ts = task_in.ts + 1;
@@ -270,7 +270,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		// printf("mid: %d, logmu: [%f, %f]\n", (int) mid, logmu[0], logmu[1]);
 
 		// Read reverse logmu
-		args_t in_args;
+		args_t in_args(0,0,0,0);
 		in_args.packed = task_in.args;
 		float lookahead[2];
 		union IntFloat temp_lookahead[2];
@@ -290,10 +290,10 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 			// printf("mid: %d, residual: %f, update_ts: %d\n", (int) mid, residual, (int) update_ts);
 
 			// Enqueue WRITE_PRIORITY_TASK
-			args_t out_args;
-			out_args.unpacked.arg0 = in_args.unpacked.arg0;
-			out_args.unpacked.arg1 = in_args.unpacked.arg1;
-			out_args.unpacked.arg2 = update_ts;
+			args_t out_args(in_args.unpacked.arg0,in_args.unpacked.arg1,update_ts,0);
+			//out_args.unpacked.arg0 = in_args.unpacked.arg0;
+			//out_args.unpacked.arg1 = in_args.unpacked.arg1;
+			//out_args.unpacked.arg2 = update_ts;
 
 			task_t task_out_temp;
 			task_out_temp.ts = task_in.ts + 1;
@@ -307,7 +307,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 
 	} else if (task_in.ttype == WRITE_PRIORITY_TASK) {
 		// Read priority
-		args_t in_args;
+		args_t in_args(0,0,0,0);
 		in_args.packed = task_in.args;
 		ap_uint<32> update_ts = in_args.unpacked.arg2;
 
@@ -320,18 +320,18 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		ulog.data = old_ts;
 		undo_log_entry->write(ulog);
 
-		l1[base_message_priorities + pid] = update_ts;
-
 		// Enqueue UPDATE_MESSAGE_TASK
-		args_t out_args;
-		out_args.unpacked.arg0 = in_args.unpacked.arg0;
-		out_args.unpacked.arg1 = in_args.unpacked.arg1;
+		args_t out_args(in_args.unpacked.arg0,in_args.unpacked.arg1,0,0);
+		//out_args.unpacked.arg0 = in_args.unpacked.arg0;
+		//out_args.unpacked.arg1 = in_args.unpacked.arg1;
 
 		task_t task_out_temp;
 		if (update_ts > task_in.ts) {
 			task_out_temp.ts = update_ts;
+			l1[base_message_priorities + pid] = update_ts;
 		} else {
 			task_out_temp.ts = task_in.ts + 1;
+			l1[base_message_priorities + pid] = task_in.ts + 1;
 		}
 		task_out_temp.object = task_in.object;
 		task_out_temp.ttype = UPDATE_MESSAGE_TASK;
@@ -350,13 +350,13 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 			ap_uint<32> mid = pid;
 
 			// Read input args
-			args_t in_args;
+			args_t in_args(0,0,0,0);
 			in_args.packed = task_in.args;
 
 			// Enqueue UPDATE_MESSAGE_VAL_TASK
-			args_t out_args;
-			out_args.unpacked.arg0 = in_args.unpacked.arg0;
-			out_args.unpacked.arg1 = in_args.unpacked.arg1;
+			args_t out_args(in_args.unpacked.arg0,in_args.unpacked.arg1,0,0);
+			//out_args.unpacked.arg0 = in_args.unpacked.arg0;
+			//out_args.unpacked.arg1 = in_args.unpacked.arg1;
 
 			task_t task_out_temp;
 			task_out_temp.ts = enq_ts + 1;
@@ -370,7 +370,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 
 	} else if (task_in.ttype == UPDATE_MESSAGE_VAL_TASK) {
 		// Read lookaheads
-		args_t in_args;
+		args_t in_args(0,0,0,0);
 		in_args.packed = task_in.args;
 		float lookahead[2];
 		union IntFloat temp_lookahead[2];
@@ -413,10 +413,10 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		ap_uint<32> nid = l1[base_message_nodes + (2 * mid) + 1];
 
 		// Enqueue UPDATE_NODE_LOGPRODUCTIN_TASK
-		args_t out_args;
-		out_args.unpacked.arg0 = temp_diff[0].intval;
-		out_args.unpacked.arg1 = temp_diff[1].intval;
-		out_args.unpacked.arg2 = mid;
+		args_t out_args(temp_diff[0].intval,temp_diff[1].intval,mid,0);
+		//out_args.unpacked.arg0 = temp_diff[0].intval;
+		//out_args.unpacked.arg1 = temp_diff[1].intval;
+		//out_args.unpacked.arg2 = mid;
 
 		task_t task_out_temp;
 		task_out_temp.ts = task_in.ts + 1;
@@ -429,7 +429,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 					
 	} else if (task_in.ttype == UPDATE_NODE_LOGPRODUCTIN_TASK) {
 		// Read diff
-		args_t in_args;
+		args_t in_args(0,0,0,0);
 		in_args.packed = task_in.args;
 		float diff[2];
 		union IntFloat temp_diff[2];
@@ -502,8 +502,8 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 				}
 
 				// Enqueue READ_REVERSE_MESSAGE_TASK
-				args_t out_args;
-				out_args.unpacked.arg0 = affected_mid;
+				args_t out_args(affected_mid,0,0,0);
+				//out_args.unpacked.arg0 = affected_mid;
 
 				task_t task_out_temp;
 				task_out_temp.ts = task_in.ts + 1;

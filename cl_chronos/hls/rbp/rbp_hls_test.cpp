@@ -103,8 +103,8 @@ int main () {
   printf("%d\n", (unsigned int) nume);
 
   for (int i = 0; i < nume * 2; i+=2) {
-	  args_t in_args;
-	  in_args.unpacked.arg0 = i + 1;
+	  args_t in_args(i+1,0,0,0);
+	  //in_args.unpacked.arg0 = i + 1;
 	  task_t initial_task = {0,i,0,in_args.packed};
 	  printf("\t Enqueue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (initial_task.ts), (unsigned int) (initial_task.object),
 			  (unsigned int)(in_args.unpacked.arg0), (unsigned int)(in_args.unpacked.arg1), (unsigned int)(in_args.unpacked.arg2), (unsigned int)(in_args.unpacked.arg3));
@@ -112,8 +112,8 @@ int main () {
   }
 
   for (int i = 1; i < nume * 2; i+=2) {
-	  args_t in_args;
-	  in_args.unpacked.arg0 = i - 1;
+	  args_t in_args(i-1,0,0,0);
+	  //in_args.unpacked.arg0 = i - 1;
 	  task_t initial_task = {0,i,0,in_args.packed};
 	  printf("\t Enqueue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (initial_task.ts), (unsigned int) (initial_task.object),
 	  			  (unsigned int)(in_args.unpacked.arg0), (unsigned int)(in_args.unpacked.arg1), (unsigned int)(in_args.unpacked.arg2), (unsigned int)(in_args.unpacked.arg3));
@@ -123,7 +123,7 @@ int main () {
   while(!pq.empty()) {
 	  task_t task_in = pq.top();
 	  pq.pop();
-	  args_t in_args;
+	  args_t in_args(0,0,0,0);
 	  in_args.packed = task_in.args;
 	  printf("\t Dequeue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (task_in.ts), (unsigned int) (task_in.object),
 	  	  			  (unsigned int)(in_args.unpacked.arg0), (unsigned int)(in_args.unpacked.arg1), (unsigned int)(in_args.unpacked.arg2), (unsigned int)(in_args.unpacked.arg3));
@@ -135,7 +135,7 @@ int main () {
 	  while(!task_out.empty()) {
 		  out = task_out.read();
 		  pq.push(out);
-		  args_t out_args;
+		  args_t out_args(0,0,0,0);
 		  out_args.packed = out.args;
 		  printf("\t Enqueue: (%u, %u), args: (%u, %u, %u, %u)\n", (unsigned int) (out.ts), (unsigned int) (out.object),
 		  	  			  (unsigned int)(out_args.unpacked.arg0), (unsigned int)(out_args.unpacked.arg1), (unsigned int)(out_args.unpacked.arg2), (unsigned int)(out_args.unpacked.arg3));

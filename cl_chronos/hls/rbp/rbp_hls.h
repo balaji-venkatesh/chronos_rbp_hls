@@ -101,7 +101,12 @@ typedef union IntFloat {
 } intfloat_t;
 
 typedef union Args {
-	Args() {};
+	Args(ap_uint<32> a0, ap_uint<32> a1, ap_uint<32> a2, ap_uint<32> a3) {
+		unpacked.arg0 = a0;
+		unpacked.arg1 = a1;
+		unpacked.arg2 = a2;
+		unpacked.arg3 = a3;
+	};
 	~Args() {};
 	struct { ap_uint<32> arg0; ap_uint<32> arg1;
 		ap_uint<32> arg2; ap_uint<32> arg3; } unpacked;
