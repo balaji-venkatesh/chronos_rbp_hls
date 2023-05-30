@@ -145,7 +145,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		// out_args.unpacked.arg1 = logmu[1];
 		// out_args.unpacked.arg2 = mid;
 
-		task_t task_out_temp = {task_in.ts + 1, source_nid + 4 * nume, CALC_LOOKAHEAD_TASK, out_args.packed};
+		task_t task_out_temp = {task_in.ts + 1, source_nid + 4 * nume, CALC_LOOKAHEAD_TASK, out_args.packed, 1};
 		//task_out_temp.ts = task_in.ts + 1;
 		//task_out_temp.object = source_nid + 4 * nume;
 		//task_out_temp.ttype = CALC_LOOKAHEAD_TASK;
@@ -249,11 +249,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		//out_args.unpacked.arg0 = temp_lookahead[0].intval;
 		//out_args.unpacked.arg1 = temp_lookahead[1].intval;
 
-		task_t task_out_temp;
-		task_out_temp.ts = task_in.ts + 1;
-		task_out_temp.object = mid;
-		task_out_temp.ttype = CALC_PRIORITY_TASK;
-		task_out_temp.args = out_args.packed;
+		task_t task_out_temp = {task_in.ts + 1, mid, CALC_PRIORITY_TASK, out_args.packed, 1};
+		//task_out_temp.ts = task_in.ts + 1;
+		//task_out_temp.object = mid;
+		//task_out_temp.ttype = CALC_PRIORITY_TASK;
+		//task_out_temp.args = out_args.packed;
 		//task_out_temp.no_write = 1;
 
 		task_out->write(task_out_temp);
@@ -295,11 +295,11 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 			//out_args.unpacked.arg1 = in_args.unpacked.arg1;
 			//out_args.unpacked.arg2 = update_ts;
 
-			task_t task_out_temp;
-			task_out_temp.ts = task_in.ts + 1;
-			task_out_temp.object = mid + 2 * nume;
-			task_out_temp.ttype = WRITE_PRIORITY_TASK;
-			task_out_temp.args = out_args.packed;
+			task_t task_out_temp = {task_in.ts + 1, mid + 2 * nume, WRITE_PRIORITY_TASK, out_args.packed, 0};
+			//task_out_temp.ts = task_in.ts + 1;
+			//task_out_temp.object = mid + 2 * nume;
+			//task_out_temp.ttype = WRITE_PRIORITY_TASK;
+			//task_out_temp.args = out_args.packed;
 			//task_out_temp.no_write = 0;
 
 			task_out->write(task_out_temp);
@@ -336,7 +336,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		task_out_temp.object = task_in.object;
 		task_out_temp.ttype = UPDATE_MESSAGE_TASK;
 		task_out_temp.args = out_args.packed;
-		//task_out_temp.no_write = 1;
+		task_out_temp.no_write = 1;
 
 		task_out->write(task_out_temp);
 
@@ -363,7 +363,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 			task_out_temp.object = mid;
 			task_out_temp.ttype = UPDATE_MESSAGE_VAL_TASK;
 			task_out_temp.args = out_args.packed;
-			//task_out_temp.no_write = 0;
+			task_out_temp.no_write = 0;
 
 			task_out->write(task_out_temp);
 		}
@@ -423,7 +423,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 		task_out_temp.object = nid + 4 * nume;
 		task_out_temp.ttype = UPDATE_NODE_LOGPRODUCTIN_TASK;
 		task_out_temp.args = out_args.packed;
-		//task_out_temp.no_write = 0;
+		task_out_temp.no_write = 0;
 
 		task_out->write(task_out_temp);
 					
@@ -510,7 +510,7 @@ void rbp_hls (task_t task_in, hls::stream<task_t>* task_out, ap_uint<32>* l1, hl
 				task_out_temp.object = reverse_affected_mid;
 				task_out_temp.ttype = READ_REVERSE_MESSAGE_TASK;
 				task_out_temp.args = out_args.packed;
-				//task_out_temp.no_write = 1;
+				task_out_temp.no_write = 1;
 
 				task_out->write(task_out_temp);
 			}

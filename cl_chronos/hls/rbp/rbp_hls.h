@@ -87,7 +87,7 @@ typedef struct __attribute__((__packed__)) {
 	ap_uint<32> object;
 	ap_uint<8> ttype;
 	ap_uint<128> args;
-	//ap_uint<1> no_write;
+	ap_uint<1> no_write;
 } task_t;
 
 typedef struct {

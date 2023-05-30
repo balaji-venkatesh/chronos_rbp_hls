@@ -109,7 +109,7 @@ logic ap_l1_bvalid;
 
 logic        task_out_valid;
 logic        task_out_ready;
-logic [TQ_WIDTH-1:0] task_out_data;
+logic [TQ_WIDTH+3:0] task_out_data;
 
 logic        app_undo_log_valid;
 logic        app_undo_log_ready;
@@ -465,8 +465,8 @@ always_ff @(posedge clk) begin
    end else begin
       if (task_out_valid & task_out_ready) begin
          task_wvalid <= 1'b1;
-         {task_wdata.args, task_wdata.ttype, task_wdata.object, task_wdata.ts}
-                  <= task_out_data;
+         {task_wdata.no_write, task_wdata.args, task_wdata.ttype, task_wdata.object, task_wdata.ts}
+                  <= task_out_data[TQ_WIDTH-1:0];
       end else if (task_wready) begin
          task_wvalid <= 1'b0;
       end else if (state == ABORT_TASK) begin
