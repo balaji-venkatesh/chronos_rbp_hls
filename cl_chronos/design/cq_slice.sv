@@ -487,7 +487,7 @@ always_comb begin
    if (state==IDLE) begin
       if (from_tq_abort_valid) begin
          ref_object = cq_object[from_tq_abort_slot];
-         ref_read_only = cq_read_only_task[from_tq_abort_slot];
+         ref_read_only = 0; // child aborts from task queue should be aborted regardless of RO
       end else if (resource_abort_start) begin
          ref_object = cq_object[max_vt_pos_fixed];
          ref_read_only = cq_read_only_task[max_vt_pos_fixed];

@@ -202,21 +202,14 @@ always_ff @(posedge clk) begin
 end
 
 task_t task_in;
-generate 
-if (!NO_ROLLBACK) begin
-   always_ff @(posedge clk) begin
-      if (task_arvalid & task_rvalid) begin
-         task_in <= task_rdata;
-      end
+
+always_ff @(posedge clk) begin
+   if (task_arvalid & task_rvalid) begin
+      task_in <= task_rdata;
    end
-
-   assign ap_start = ((state == START_CORE) & !abort_running_task_q) | ((state == WAIT_CORE) & ap_rst_n);
-end else begin
-   assign task_in = task_rdata;
-   assign ap_start = (task_arvalid & task_rvalid);
-
 end
-endgenerate
+
+assign ap_start = ((state == START_CORE) & !abort_running_task_q) | ((state == WAIT_CORE) & ap_rst_n);
 
 assign task_arvalid = (state == NEXT_TASK) & start & (dequeues_remaining >0) & ap_rst_n;
 
@@ -331,27 +324,6 @@ always_ff @(posedge clk) begin
             cycle, TILE_ID, CORE_ID);
    end
 end
-
-// always_ff @(state) begin
-//    if (state == NEXT_TASK) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: NEXT_TASK", cycle, TILE_ID, CORE_ID);
-//    end else if (state == INFORM_CQ) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: INFORM_CQ", cycle, TILE_ID, CORE_ID);
-//    end else if (state == START_CORE) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: START_CORE", cycle, TILE_ID, CORE_ID);
-//    end else if (state == WAIT_CORE) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: WAIT_CORE", cycle, TILE_ID, CORE_ID);
-//    end else if (state == ABORT_TASK) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: ABORT_TASK", cycle, TILE_ID, CORE_ID);
-//    end else if (state == FINISH_TASK) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: FINISH_TASK", cycle, TILE_ID, CORE_ID);
-//    end else if (state == WAIT_BVALID) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: WAIT_BVALID", cycle, TILE_ID, CORE_ID);
-//    end else if (state == WAIT_RVALID) begin
-//       $display("[%5d][tile-%2d][core-%2d] state: WAIT_RVALID", cycle, TILE_ID, CORE_ID);
-//    end
-// end
-
 
 `endif
 
@@ -504,15 +476,7 @@ always_ff @(posedge clk) begin
    end
 end
 
-generate
-if (NO_ROLLBACK) begin
-   // 1-task/cycle, don't do this if SPEC beacuse of possible critical path
-   // issues
-   assign task_out_ready = !task_wvalid |(task_wvalid & task_wready);
-end else begin
-   assign task_out_ready = !task_wvalid;
-end 
-endgenerate
+assign task_out_ready = !task_wvalid;
 
 always_ff @(posedge clk) begin
    if (!rstn) begin

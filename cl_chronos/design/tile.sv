@@ -212,7 +212,7 @@ axi_bus_t ocl_bus_q();
 
 axi_bus_t ocl_l1(); // DEPRECATED
 
-logic [31:0] done;
+logic [31:0] ocl_done;
 logic [31:0] l2_out_debug;
 ocl_slave  
 #(
@@ -243,7 +243,7 @@ ocl_slave
 
   .l1(ocl_l1),
    
-  .done(done),
+  .done(ocl_done),
   .cur_cycle(cur_cycle),
 
   .l2_debug(l2_out_debug)
@@ -1880,6 +1880,8 @@ assign abort_child_out.resp_tile = TILE_ID;
 logic splitter_idle;
 assign splitter_idle = (splitter_lvt_out == '1);
 
+logic [31:0] done;
+logic [4:0] done_cnt;
 always @(posedge clk_main_a0) begin
    if (!rst_main_n_sync) begin
       done <= 0;
@@ -1887,6 +1889,19 @@ always @(posedge clk_main_a0) begin
       done <= { {26{1'b1}}, splitter_idle, tq_empty, tsb_empty, all_cores_idle, out_task_fifo_empty, ro_idle};
    end
 
+   if ((done == '1) && (done_cnt < 30)) begin
+      done_cnt <= done_cnt + 1;
+   end else if ((done == '1) && (done_cnt == 30)) begin
+      done_cnt <= 30;
+   end else begin
+      done_cnt <= 0;
+   end
+
+   if (done_cnt == 30) begin
+      ocl_done <= '1;
+   end else begin
+      ocl_done <= '0;
+   end
 end
 
 
