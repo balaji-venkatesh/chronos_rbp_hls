@@ -240,6 +240,9 @@ int main(int argc, char **argv) {
     if (strcmp(str_app, "silo") ==0) {
         app = APP_SILO;
     }
+    if (strcmp(str_app, "rbp") ==0) {
+        app = APP_RBP;
+    }
     if (argc >=4 ) fhex = fopen(argv[cur_arg+2], "r"); // code hex
     if ( (app > 0) & (argc <3)) {
         printf("Need input file\n");
@@ -831,6 +834,32 @@ int test_chronos(int slot_id, int pf_id, int bar_id, FILE* fg, int app) {
 
             pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ, 0 );
             break;
+        case APP_RBP:
+            printf("APP_RBP\n");
+            for (int i = 0; i < (2 * headers[2]); i += 2) {
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARG_WORD, 0 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARGS , i+1 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARG_WORD, 1 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARGS , 0 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_OBJECT , i );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_TTYPE, 0 );
+
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ, 0 );
+            }
+
+            for (int i = 1; i < (2 * headers[2]); i += 2) {
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARG_WORD, 0 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARGS , i-1 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARG_WORD, 1 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_ARGS , 0 );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_OBJECT , i );
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ_TTYPE, 0 );
+
+                pci_poke(0, ID_OCL_SLAVE, OCL_TASK_ENQ, 0 );
+            }
+
+
+            break;
 
     }
     printf("Starting Applicaton\n");
@@ -1343,6 +1372,17 @@ int test_chronos(int slot_id, int pf_id, int bar_id, FILE* fg, int app) {
                 }
            }
            printf("Verification complete. %d/%d errors\n", num_errors, lSizeRef/4);
+           break;
+        case APP_RBP:
+           printf("RBP verification\n");
+           results = (uint32_t*) malloc(16*(numE+16));
+           for (int i=0;i<numE;i++){
+               fpga_dma_burst_read(read_fd, (uint8_t*) (results + i*16), 16, headers[11]*4 + i*16);
+           }
+           for (int i=0;i<numE*2;i++) {
+               printf("message %d: (%f, %f)\n", i, *((float *) (&results[i*2])), *((float *) (&results[i*2 + 1])));
+           }
+
            break;
 
    }
