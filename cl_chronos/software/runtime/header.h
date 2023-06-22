@@ -319,7 +319,8 @@ extern uint16_t pci_device_id; /* PCI Device ID preassigned by Amazon for F1 app
 #define APP_COLOR 4
 #define APP_MAXFLOW 5
 #define APP_SILO 6
-#define APP_LAST 7
+#define APP_RBP 7
+#define APP_LAST 8
 
 typedef struct {
    uint excess;
