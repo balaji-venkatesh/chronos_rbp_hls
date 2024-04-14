@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="/home/balaji/chronos_dev/cl_chronos/verif/sim/test_chronos/tb.wdb" id="1">
+         <top_modules>
+            <top_module name="\$unit_cl_chronos_defines_vh " />
+            <top_module name="arch_package" />
+            <top_module name="chronos" />
+            <top_module name="des" />
+            <top_module name="glbl" />
+            <top_module name="proj_package" />
+            <top_module name="tb" />
+            <top_module name="tb_type_defines_pkg" />
+            <top_module name="test_chronos" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="124.380001 us"></ZoomEndTime>
+      <Cursor1Time time="42.044000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="276"></NameColumnWidth>
+      <ValueColumnWidth column_width="82"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="17" />
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_0/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_0_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_1/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_1_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_2/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_2_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_3/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_3_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_4/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_4_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_5/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_5_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_6/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_6_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_7/state">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state[2:0]</obj_property>
+      <obj_property name="ObjectShortName">state[2:0]</obj_property>
+      <obj_property name="label">CORE_7_STATE</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_0/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_0_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_1/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_1_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_2/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_2_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_3/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_3_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_4/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_4_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_5/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_5_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_6/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_6_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /CORE_7/task_in.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">CORE_7_TASK_IN_TS</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject type="array" fp_name="/tb/card/fpga/CL/\tile[0].TILE /TASK_UNIT/task_deq_data.ts">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">.ts[31:0]</obj_property>
+      <obj_property name="ObjectShortName">.ts[31:0]</obj_property>
+      <obj_property name="label">TILE_TASK_UNIT_DEQ_TS</obj_property>
+   </wvobject>
+</wave_config>

@@ -1870,7 +1870,8 @@ tsb TSB (
 
    .lvt(lvt_tsb_out.ts),
    .empty(tsb_empty),
-  
+   .gvt(gvt),
+
    .reg_bus(reg_bus[ID_TSB])
 );
 

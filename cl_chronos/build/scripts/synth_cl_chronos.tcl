@@ -76,7 +76,8 @@ read_ip [ list \
   $HDK_SHELL_DESIGN_DIR/ip/dest_register_slice/dest_register_slice.xci \
   $HDK_SHELL_DESIGN_DIR/ip/axi_clock_converter_0/axi_clock_converter_0.xci \
   $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice/axi_register_slice.xci \
-  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci
+  $HDK_SHELL_DESIGN_DIR/ip/axi_register_slice_light/axi_register_slice_light.xci \
+  ~/rbp_hls_dummy_project.srcs/sources_1/bd/design_1/ip/design_1_rbp_hls_0_0/design_1_rbp_hls_0_0.xci
 ]
 
 #Read IP for virtual jtag / ILA/VIO

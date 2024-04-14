@@ -501,7 +501,7 @@ end else begin : gen
          end
       end else if (can_take_new_task & s_wvalid[write_select]) begin
          children_array_process_new_enq = 1'b1;
-         // Unfortunate to be calling this variable
+         // Unfortunate to be calling this variable // !!!bv
          // 'children_array_process_new_enq' even when the new enq does not
          // result in a children_array write. //FIXME
          if (!s_enq_untied[write_select]) begin
@@ -578,7 +578,9 @@ end else begin : gen
             end
             task_retry_tsb_id <= nack_fifo_out.tsb_slot;
             task_retry_abort <= nacked_task_is_aborted; 
-         end else if (children_array_process_new_enq) begin
+         end else if (children_array_process_new_enq | !can_take_new_task) begin
+            // !!! I have included can_take_new_task here to allow the system to change the task that is being
+            // queued in case of backpressure, to allow the task to be changed to one that is untied
             // tied_vector cannot be unset when the task is still running
             task_enq_tied <= task_enq_tied_next;
             task_enq_data <= s_wdata[write_select];

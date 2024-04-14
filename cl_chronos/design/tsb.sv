@@ -77,6 +77,7 @@ module tsb
    reg_bus_t.master reg_bus,
 
    output ts_t    lvt,
+   input  vt_t    gvt, // !!!bv added, but might not be required since we just care whether the tasks are untied
    output logic   empty // for termination detection
 
 );

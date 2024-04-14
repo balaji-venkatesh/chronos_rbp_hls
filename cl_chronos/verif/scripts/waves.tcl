@@ -13,7 +13,12 @@
 # implied. See the License for the specific language governing permissions and
 # limitations under the License.
 
+# open_wave_config "../../scripts/tb.wcfg"
 set curr_wave [current_wave_config]
+
+set wavewant [get_objects -r /tb/card/fpga/CL/\tile[0].TILE /*]
+add_wave $wavewant
+
 if { [string length $curr_wave] == 0 } {
   if { [llength [get_objects]] > 0} {
     add_wave /
@@ -23,5 +28,5 @@ if { [string length $curr_wave] == 0 } {
   }
 }
 
-run 200 us 
+run 2000 s 
 quit

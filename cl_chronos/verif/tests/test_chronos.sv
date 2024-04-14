@@ -820,9 +820,10 @@ endtask
    
 task flush_caches; 
    // Faster simulation by capping flushing to read-write data (BIG HACK)
+   // !bv! REMOVED BIG HACK
    if (APP_NAME != "silo") begin 
-   tb.card.fpga.CL.\tile[0].TILE .\l2[0].L2 .L2_STAGE_1.flush_addr_last = (file[3] >> 4);
-   tb.card.fpga.CL.\tile[0].TILE .\l2[1].L2 .L2_STAGE_1.flush_addr_last = (file[3] >> 4);
+   //tb.card.fpga.CL.\tile[0].TILE .\l2[0].L2 .L2_STAGE_1.flush_addr_last = (file[3] >> 4);
+   //tb.card.fpga.CL.\tile[0].TILE .\l2[1].L2 .L2_STAGE_1.flush_addr_last = (file[3] >> 4);
 
    //tb.card.fpga.CL.\tile[1].TILE .\l2[0].L2 .L2_STAGE_1.flush_addr_last = (file[3] >> 4);
    //tb.card.fpga.CL.\tile[1].TILE .\l2[1].L2 .L2_STAGE_1.flush_addr_last = (file[3] >> 4);

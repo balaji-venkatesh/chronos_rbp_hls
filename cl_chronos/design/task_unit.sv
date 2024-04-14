@@ -1265,7 +1265,7 @@ endgenerate
       if (!rstn) begin
          task_unit_throttle_margin <= NO_ROLLBACK ? 1000 : 0;
          task_spill_threshold <= SPILL_THRESHOLD;
-         task_unit_tied_capacity <= (2**(LOG_TQ_SIZE-2) -1 );
+         task_unit_tied_capacity <= (2**(LOG_TQ_SIZE-2)-1);
          task_unit_clean_threshold <= 40;
          task_unit_spill_size <= 32; // has to be muliple of 8
          tq_stall <= 0;

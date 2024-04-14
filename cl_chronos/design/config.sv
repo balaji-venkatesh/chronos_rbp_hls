@@ -56,8 +56,8 @@ package chronos;
    parameter N_TILES = 1;   // Number of tiles
    parameter N_THREADS = 32; 
    parameter LOG_CQ_SLICE_SIZE = 10; // log of Commit Queue size per tile
-   parameter LOG_TQ_SIZE = 12;  // Task Queue: Task Array size
-   parameter TQ_STAGES = 13;  // Task Queue: min_heap size (has to be >= array size)
+   parameter LOG_TQ_SIZE = 15;  // !!! originally 12 Task Queue: Task Array size
+   parameter TQ_STAGES = 16;  // !!! originally 13 Task Queue: min_heap size (has to be >= array size)
    parameter LOG_READY_LIST_SIZE = 6; // Size of the ready list in object serializer
    parameter CACHE_INDEX_WIDTH = 11; // index bits in cache
    parameter CACHE_NUM_WAYS = 4;     // number of cache ways
@@ -70,24 +70,25 @@ package chronos;
    // a bitmask specifying which tiles are being actively logged. 
    // eg: TASK_UNIT_LOGGING = 'hf means first four tiles' task units are being
    // logged.
-   parameter TASK_UNIT_LOGGING = 1;
-   parameter COMMIT_QUEUE_LOGGING = 1;
-   parameter SPLITTER_LOGGING = 1;
-   parameter UNDO_LOG_LOGGING = 1;
-   parameter SERIALIZER_LOGGING = 1;
-   parameter L2_LOGGING = 1;
-   parameter CORE_LOGGING = 1; // deprecated
-   parameter READ_RW_LOGGING = 1;
-   parameter WRITE_RW_LOGGING = 1;
-   parameter READ_ONLY_STAGE_LOGGING = 1;
-   parameter PCI_LOGGING = 1;
-
+   // !!! originally all 1, now set to 0
+   parameter TASK_UNIT_LOGGING = 0;
+   parameter COMMIT_QUEUE_LOGGING = 0;
+   parameter SPLITTER_LOGGING = 0;
+   parameter UNDO_LOG_LOGGING = 0;
+   parameter SERIALIZER_LOGGING = 0;
+   parameter L2_LOGGING = 0;
+   parameter CORE_LOGGING = 0; // deprecated
+   parameter READ_RW_LOGGING = 0;
+   parameter WRITE_RW_LOGGING = 0;
+   parameter READ_ONLY_STAGE_LOGGING = 0;
+   parameter PCI_LOGGING = 0;
+   // !!! originally all 1, now set to 0
    // Stats parameters. The value of each parameter is a bitmask specifying
    // which tiles' stats are being recorded. 
-   parameter CORE_STATE_STATS = 1;
-   parameter SERIALIZER_STATS = 1;
-   parameter TQ_STATS = 1;
-   parameter CQ_STATS = 1;
+   parameter CORE_STATE_STATS = 0;
+   parameter SERIALIZER_STATS = 0;
+   parameter TQ_STATS = 0;
+   parameter CQ_STATS = 0;
 
    
    // Lesser used config options. 
